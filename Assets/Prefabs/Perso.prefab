@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4208487265587606179
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7980535453587657684}
+  m_Layer: 0
+  m_Name: TargetTP
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7980535453587657684
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4208487265587606179}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1624137941701513310}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4856788449712742814
 GameObject:
   m_ObjectHideFlags: 0
@@ -35,6 +66,7 @@ Transform:
   m_Children:
   - {fileID: 5126223665206887795}
   - {fileID: 7150450371371992468}
+  - {fileID: 7980535453587657684}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &3202939005351600591
@@ -105,7 +137,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BougePerso
   vitesseMarche: 6
-  vitesseCourse: 15
+  vitesseCourse: 10
   vitesseRotation: 1
   accelerationDeceleration: 10
   deceleration: 30
@@ -117,8 +149,8 @@ MonoBehaviour:
   GroundedRadius: 0.5
   layerSol:
     serializedVersion: 2
-    m_Bits: 0
-  cibleCinemachine: {fileID: 0}
+    m_Bits: 1
+  cibleCinemachine: {fileID: 9028484229246398460}
   maxMouvCamHaut: 90
   maxMouvCamBas: -90
   zoneBordEcran: 20
@@ -131,24 +163,8 @@ MonoBehaviour:
   animator: {fileID: 0}
   arme: {fileID: 0}
   mire: {fileID: 0}
-  panneauDebut: {fileID: 0}
-  panneauInfos: {fileID: 0}
-  panneauMaire: {fileID: 0}
-  panneauLimites: {fileID: 0}
-  PV4: {fileID: 0}
-  PV3: {fileID: 0}
-  PV2: {fileID: 0}
-  PV1: {fileID: 0}
-  piecesJaunes: {fileID: 0}
-  piecesRouges: {fileID: 0}
-  ouch: {fileID: 0}
-  tire: {fileID: 0}
-  recharge: {fileID: 0}
-  stress: {fileID: 0}
   dureeInvincibilite: 1.5
   infosPerso: {fileID: 0}
-  diamant: {fileID: 0}
-  temps: {fileID: 0}
 --- !u!114 &6461897965989446756
 MonoBehaviour:
   m_ObjectHideFlags: 0

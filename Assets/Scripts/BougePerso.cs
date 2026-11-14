@@ -1,6 +1,4 @@
-using TMPro;
 using UnityEngine;
-using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 
 
@@ -101,19 +99,19 @@ public class BougePerso : MonoBehaviour
     private bool equipe = false;
 
 
-    [Space(5)]
-    [Header("Panneaux")]
-    [SerializeField] private GameObject panneauDebut;
-    [SerializeField] private GameObject panneauInfos;
-    [SerializeField] private GameObject panneauMaire;
-    [SerializeField] private GameObject panneauLimites;
+    //[Space(5)]
+    //[Header("Panneaux")]
+    //[SerializeField] private GameObject panneauDebut;
+    //[SerializeField] private GameObject panneauInfos;
+    //[SerializeField] private GameObject panneauMaire;
+    //[SerializeField] private GameObject panneauLimites;
 
-    [Space(5)]
-    [Header("Coeurs")]
-    [SerializeField] private GameObject PV4;
-    [SerializeField] private GameObject PV3;
-    [SerializeField] private GameObject PV2;
-    [SerializeField] private GameObject PV1;
+    //[Space(5)]
+    //[Header("Coeurs")]
+    //[SerializeField] private GameObject PV4;
+    //[SerializeField] private GameObject PV3;
+    //[SerializeField] private GameObject PV2;
+    //[SerializeField] private GameObject PV1;
 
 
     [Space(5)]
@@ -128,28 +126,28 @@ public class BougePerso : MonoBehaviour
     private Vector3 vitesseHorizontaleActuelle;
 
 
-    [Space(5)]
-    [Header("Sons")]
+    //[Space(5)]
+    //[Header("Sons")]
     // GameObjects avec les effets sonores des pièces
-    [SerializeField] private GameObject piecesJaunes;
-    [SerializeField] private GameObject piecesRouges;
+    //[SerializeField] private GameObject piecesJaunes;
+    //[SerializeField] private GameObject piecesRouges;
 
     // GameObjects avec les effets sonores du perso
-    [SerializeField] private GameObject ouch;
-    [SerializeField] private GameObject tire;
-    [SerializeField] private GameObject recharge;
+    //[SerializeField] private GameObject ouch;
+    //[SerializeField] private GameObject tire;
+    //[SerializeField] private GameObject recharge;
 
     // GameObject avec la musique stressante
-    [SerializeField] private GameObject stress;
+    //[SerializeField] private GameObject stress;
 
     // Indique si la musique stressante a déjà été activée
-    private bool musiqueStressActivee = false;
+    //private bool musiqueStressActivee = false;
 
     // AudioSource du tir, de la recharge, de la caméra principale et de la douleur
-    private AudioSource audioTir;
-    private AudioSource audioRecharge;
-    private AudioSource audioPrincipal;
-    private AudioSource audioOuch;
+    //private AudioSource audioTir;
+    //private AudioSource audioRecharge;
+    //private AudioSource audioPrincipal;
+    //private AudioSource audioOuch;
 
     // Indique si le perso est en train de recharger
     private bool rechargementEnCours = false;
@@ -183,17 +181,17 @@ public class BougePerso : MonoBehaviour
 
 
     // Diamant
-    [SerializeField] private GameObject diamant;
+    //[SerializeField] private GameObject diamant;
 
     // Indique si le diamant est déjà apparu
-    private bool diamantApparu = false;
+    //private bool diamantApparu = false;
 
     // Indique si la victoire est en attente
     private bool victoireEnAttente = false;
 
 
     // Zone de texte avec le chrono
-    [SerializeField] private TMP_Text temps;
+    //[SerializeField] private TMP_Text temps;
 
     // Temps actuel du chrono
     float currentTime = 0f;
@@ -220,22 +218,22 @@ public class BougePerso : MonoBehaviour
         lesInputs = GetComponent<StarterAssetsInputs>();
 
         // Récupère les AudioSources du tir, de la recharge et de la douleur
-        audioTir = tire.GetComponent<AudioSource>();
-        audioRecharge = recharge.GetComponent<AudioSource>();
-        audioOuch = ouch.GetComponent<AudioSource>();
+        //audioTir = tire.GetComponent<AudioSource>();
+        //audioRecharge = recharge.GetComponent<AudioSource>();
+        //audioOuch = ouch.GetComponent<AudioSource>();
 
         // Réinitialise les délais de saut
         sautTimeout = delaiSaut;
 
         // Récupère l'AudioSource de la caméra principale
-        GameObject cameraPrincipale = GameObject.Find("Main Camera");
-        audioPrincipal = cameraPrincipale.GetComponent<AudioSource>();
+        //GameObject cameraPrincipale = GameObject.Find("Main Camera");
+        //audioPrincipal = cameraPrincipale.GetComponent<AudioSource>();
 
         // Désactive la musique stressante au début de la partie
-        stress.SetActive(false);
+        //stress.SetActive(false);
 
         // Affiche le panneau du début
-        panneauDebut.SetActive(true);
+        //panneauDebut.SetActive(true);
 
         // Invoque la méthode "EnleverPanneaux" dans 3 secondes
         Invoke(nameof(EnleverPanneaux), 3f);
@@ -258,33 +256,33 @@ public class BougePerso : MonoBehaviour
             DirectionTP();
 
         // Lance le chrono
-        currentTime -= Time.deltaTime;
+        //currentTime -= Time.deltaTime;
 
         // Empêche le chrono de descendre sous 0
-        currentTime = Mathf.Max(0f, currentTime);
+        //currentTime = Mathf.Max(0f, currentTime);
 
         // Met à jour la valeur du temps du perso
-        temps.text = "Temps : " + currentTime.ToString("0");
-        infosPerso.temps = (int)currentTime;
+        //temps.text = "Temps : " + currentTime.ToString("0");
+        //infosPerso.temps = (int)currentTime;
 
         // Si le temps est inférieur ou égal à 30 secondes
-        if (currentTime <= 30f && currentTime > 0f && !musiqueStressActivee)
-        {
-            // Arrête la musique principale
-            audioPrincipal.enabled = false;
+        //if (currentTime <= 30f && currentTime > 0f && !musiqueStressActivee)
+        //{
+        // Arrête la musique principale
+        //audioPrincipal.enabled = false;
 
-            // Active la musique stressante
-            stress.SetActive(true);
-            musiqueStressActivee = true;
-        }
+        // Active la musique stressante
+        //stress.SetActive(true);
+        //musiqueStressActivee = true;
+        //}
 
         // Si le temps est écoulé
-        if (currentTime <= 0f)
-        {
-            // Exécute la méthode de défaite
-            SceneDefaite();
-            return;
-        }
+        //if (currentTime <= 0f)
+        //{
+        // Exécute la méthode de défaite
+        //SceneDefaite();
+        //return;
+        //}
 
         // Exécute les méthodes suivantes à chaque frame
         Attaque();
@@ -292,7 +290,7 @@ public class BougePerso : MonoBehaviour
         VerifierSol();
         SautEtGravite();
         DebutAnim();
-        DiamantApparu();
+        //DiamantApparu();
     }
 
 
@@ -518,10 +516,10 @@ public class BougePerso : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
 
         // Active l'AudioSource du tir
-        audioTir.enabled = true;
+        //audioTir.enabled = true;
 
         // Programme la fin du tir
-        Invoke(nameof(FiniTir), audioTir.clip.length);
+        //Invoke(nameof(FiniTir), audioTir.clip.length);
 
         // Délai pour retourner à la caméra 3e personne
         cooldown = 5f;
@@ -608,10 +606,10 @@ public class BougePerso : MonoBehaviour
     void FiniTir()
     {
         // Arrête le son du tir
-        audioTir.enabled = false;
+        //audioTir.enabled = false;
 
         // Commence la recharge
-        Recharge();
+        //Recharge();
     }
 
 
@@ -619,10 +617,10 @@ public class BougePerso : MonoBehaviour
     void Recharge()
     {
         // Active l'AudioSource de recharge
-        audioRecharge.enabled = true;
+        //audioRecharge.enabled = true;
 
         // Attend la durée complète du son
-        Invoke(nameof(DesactiveRecharge), audioRecharge.clip.length);
+        //Invoke(nameof(DesactiveRecharge), audioRecharge.clip.length);
     }
 
 
@@ -630,19 +628,19 @@ public class BougePerso : MonoBehaviour
     void DesactiveRecharge()
     {
         // Arrête le son de recharge
-        audioRecharge.enabled = false;
+        //audioRecharge.enabled = false;
 
         // Autorise un nouveau tir
-        rechargementEnCours = false;
+        //rechargementEnCours = false;
     }
 
 
     // Désactive l'Audio source des pièces et de la douleur du perso
     void DesactiveSons()
     {
-        piecesJaunes.GetComponent<AudioSource>().enabled = false;
-        piecesRouges.GetComponent<AudioSource>().enabled = false;
-        audioOuch.enabled = false;
+        //piecesJaunes.GetComponent<AudioSource>().enabled = false;
+        //piecesRouges.GetComponent<AudioSource>().enabled = false;
+        //audioOuch.enabled = false;
     }
 
 
@@ -651,10 +649,10 @@ public class BougePerso : MonoBehaviour
     // Enlève les panneaux actifs
     void EnleverPanneaux()
     {
-        panneauDebut.SetActive(false);
-        panneauInfos.SetActive(false);
-        panneauMaire.SetActive(false);
-        panneauLimites.SetActive(false);
+        //panneauDebut.SetActive(false);
+        //panneauInfos.SetActive(false);
+        //panneauMaire.SetActive(false);
+        //panneauLimites.SetActive(false);
     }
 
 
@@ -667,7 +665,7 @@ public class BougePerso : MonoBehaviour
         if (collision.CompareTag("PiecesJaunes"))
         {
             // Active l'Audio source des pièces
-            piecesJaunes.GetComponent<AudioSource>().enabled = true;
+            //piecesJaunes.GetComponent<AudioSource>().enabled = true;
 
             // Détruit la pièce
             Destroy(collision.gameObject);
@@ -687,7 +685,7 @@ public class BougePerso : MonoBehaviour
         if (collision.CompareTag("PiecesRouges"))
         {
             // Active l'Audio source des pièces
-            piecesRouges.GetComponent<AudioSource>().enabled = true;
+            //piecesRouges.GetComponent<AudioSource>().enabled = true;
 
             // Détruit la pièce
             Destroy(collision.gameObject);
@@ -713,7 +711,7 @@ public class BougePerso : MonoBehaviour
         if (collision.CompareTag("panneauInfos"))
         {
             // Affiche le panneau
-            panneauInfos.SetActive(true);
+            //panneauInfos.SetActive(true);
 
             // Invoque la méthode "EnleverPanneaux" dans 2 secondes
             Invoke(nameof(EnleverPanneaux), 2f);
@@ -724,7 +722,7 @@ public class BougePerso : MonoBehaviour
         if (collision.CompareTag("panneauMaire"))
         {
             // Affiche le panneau
-            panneauMaire.SetActive(true);
+            //panneauMaire.SetActive(true);
 
             // Invoque la méthode "EnleverPanneaux" dans 2 secondes
             Invoke(nameof(EnleverPanneaux), 2f);
@@ -735,7 +733,7 @@ public class BougePerso : MonoBehaviour
         if (collision.CompareTag("mursLimites"))
         {
             // Affiche le panneau
-            panneauLimites.SetActive(true);
+            //panneauLimites.SetActive(true);
 
             // Invoque la méthode "EnleverPanneaux" dans 2 secondes
             Invoke(nameof(EnleverPanneaux), 2f);
@@ -760,7 +758,7 @@ public class BougePerso : MonoBehaviour
             infosPerso.nbPV = Mathf.Max(0, infosPerso.nbPV - 1);
 
             // Active le son de douleur
-            audioOuch.enabled = true;
+            //audioOuch.enabled = true;
 
             // Affiche les PV mis à jour
             PointsVie();
@@ -808,21 +806,21 @@ public class BougePerso : MonoBehaviour
         infosPerso.nbPV = Mathf.Clamp(infosPerso.nbPV, 0, 4);
 
         // Tableau contenant les 4 coeurs
-        GameObject[] coeurs = { PV1, PV2, PV3, PV4 };
+        //GameObject[] coeurs = { PV1, PV2, PV3, PV4 };
 
         // Parcourt les 4 coeurs
-        for (int i = 0; i < coeurs.Length; i++)
-        {
-            // Détermine si le coeur doit être visible
-            bool actif = i < infosPerso.nbPV;
-            coeurs[i].SetActive(actif);
+        //for (int i = 0; i < coeurs.Length; i++)
+        //{
+        // Détermine si le coeur doit être visible
+        //bool actif = i < infosPerso.nbPV;
+        //coeurs[i].SetActive(actif);
 
-            // Récupère l'Animator du coeur
-            Animator animatorCoeur = coeurs[i].GetComponent<Animator>();
+        // Récupère l'Animator du coeur
+        //Animator animatorCoeur = coeurs[i].GetComponent<Animator>();
 
-            // Anime uniquement le coeur correspondant aux PV actuels
-            animatorCoeur.enabled = (i == infosPerso.nbPV - 1);
-        }
+        // Anime uniquement le coeur correspondant aux PV actuels
+        //animatorCoeur.enabled = (i == infosPerso.nbPV - 1);
+        //}
 
         // Si le perso n'a plus de PV, charge la scène de défaite
         if (infosPerso.nbPV == 0 && !defaiteEnAttente)
@@ -838,14 +836,14 @@ public class BougePerso : MonoBehaviour
     // Quand le perso a ramassé toutes les pièces et tué tous les ennemis
     void DiamantApparu()
     {
-        if (infosPerso.nbPieces == 10 && infosPerso.nbEnnemis == 10 && !diamantApparu && diamant != null)
-        {
-            // Active le diamant
-            diamant.SetActive(true);
+        //if (infosPerso.nbPieces == 10 && infosPerso.nbEnnemis == 10 && !diamantApparu && diamant != null)
+        //{
+        // Active le diamant
+        //diamant.SetActive(true);
 
-            // Empêche de tenter de l'activer à nouveau
-            diamantApparu = true;
-        }
+        // Empêche de tenter de l'activer à nouveau
+        //diamantApparu = true;
+        //}
     }
 
 
@@ -859,8 +857,8 @@ public class BougePerso : MonoBehaviour
         partieTerminee = true;
 
         // Arrête les musiques
-        audioPrincipal.enabled = false;
-        stress.SetActive(false);
+        //audioPrincipal.enabled = false;
+        //stress.SetActive(false);
 
         // Charge la scène correspondante
         SceneManager.LoadScene(nomScene);
@@ -870,13 +868,13 @@ public class BougePerso : MonoBehaviour
     // Arrête les déplacements de tous les ennemis
     void ArreterEnnemis()
     {
-        NavMeshAgent[] ennemis = FindObjectsByType<NavMeshAgent>(FindObjectsSortMode.None);
+        //NavMeshAgent[] ennemis = FindObjectsByType<NavMeshAgent>(FindObjectsSortMode.None);
 
-        foreach (NavMeshAgent ennemi in ennemis)
-        {
-            ennemi.isStopped = true;
-            ennemi.ResetPath();
-        }
+        //foreach (NavMeshAgent ennemi in ennemis)
+        //{
+        //ennemi.isStopped = true;
+        //ennemi.ResetPath();
+        //}
     }
 
 
