@@ -1,4 +1,4 @@
-# Procedural_Shooter
+# Procedural_Dungeon
 
 Ce projet permet de créer un système de génération procédurale automatique de niveaux de donjon médiéval fantastique.
 
