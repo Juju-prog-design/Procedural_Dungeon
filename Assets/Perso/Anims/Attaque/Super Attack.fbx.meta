@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: f988daaccf36e0343bb4932bf254c044
+guid: a39c78256f7b2484c8eead281cd0606a
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
@@ -32,11 +32,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Block (Turn Right)
+      name: Super Attack
       takeName: mixamo.com
       internalID: -203655887218126122
       firstFrame: 0
-      lastFrame: 28
+      lastFrame: 73
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
