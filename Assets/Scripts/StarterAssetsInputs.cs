@@ -9,7 +9,7 @@ public class StarterAssetsInputs : MonoBehaviour
     public Vector2 regarder;
     public bool saute;
     public bool cours;
-    public bool tire;
+    public bool attaque;
 
 
     // Bouger
@@ -68,9 +68,9 @@ public class StarterAssetsInputs : MonoBehaviour
     }
 
 
-    // Valeurs quand le perso tire avec son arme
-    public void OnTire(InputValue value)
+    // Valeurs quand le perso attaque avec son arme
+    public void OnAttaque(InputValue value)
     {
-        tire = value.isPressed;
+        attaque = value.isPressed;
     }
 }

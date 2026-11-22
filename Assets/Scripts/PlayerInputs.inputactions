@@ -30,7 +30,7 @@
                     "name": "Saute",
                     "type": "Button",
                     "id": "be966aa9-2a73-4fbc-a576-be08a36b47e2",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false,
@@ -47,10 +47,10 @@
                     "priority": 0
                 },
                 {
-                    "name": "Tire",
+                    "name": "Attaque",
                     "type": "Button",
                     "id": "711fa638-8dd1-459c-8bc4-0203cc738a23",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false,
@@ -197,7 +197,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Tire",
+                    "action": "Attaque",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

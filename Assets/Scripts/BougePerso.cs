@@ -481,11 +481,11 @@ public class BougePerso : MonoBehaviour
     void Attaque()
     {
         // Si le perso ne tire pas, ne rien faire
-        if (!lesInputs.tire)
+        if (!lesInputs.attaque)
             return;
 
         // Réinitialise l'input pour éviter un tir automatique après la recharge
-        lesInputs.tire = false;
+        lesInputs.attaque = false;
 
         // Empêche de tirer pendant la recharge
         if (rechargementEnCours || partieTerminee)
