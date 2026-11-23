@@ -7,70 +7,54 @@ public class StarterAssetsInputs : MonoBehaviour
     [Header("Valeurs de déplacement du perso")]
     public Vector2 bouge;
     public Vector2 regarder;
+
+    [Header("Commandes du perso")]
     public bool saute;
     public bool cours;
     public bool attaque;
+    public bool superAttaque;
+    public bool bloquer;
 
 
-    // Bouger
+    // Déplacement (WASD)
     public void OnBouge(InputValue value)
     {
-        MoveInput(value.Get<Vector2>());
+        bouge = value.Get<Vector2>();
     }
 
-
-    // Regarder
+    // Caméra (Souris)
     public void OnRegarder(InputValue value)
     {
-        LookInput(value.Get<Vector2>());
+        regarder = value.Get<Vector2>();
     }
 
-
-    // Sauter
+    // Saut (Space)
     public void OnSaute(InputValue value)
     {
         saute = value.isPressed;
     }
 
-
-    // Courir
+    // Course (Left Shift)
     public void OnCours(InputValue value)
     {
         cours = value.isPressed;
     }
 
-
-    // Valeurs quand le perso bouge
-    public void MoveInput(Vector2 newMoveDirection)
-    {
-        bouge = newMoveDirection;
-    }
-
-
-    // Valeurs quand le perso regarde
-    public void LookInput(Vector2 newLookDirection)
-    {
-        regarder = newLookDirection;
-    }
-
-
-    // Valeurs quand le perso saute
-    public void JumpInput(bool newJumpState)
-    {
-        saute = newJumpState;
-    }
-
-
-    // Valeurs quand le perso cours
-    public void SprintInput(bool newSprintState)
-    {
-        cours = newSprintState;
-    }
-
-
-    // Valeurs quand le perso attaque avec son arme
+    // Attaque normale (Left Click)
     public void OnAttaque(InputValue value)
     {
         attaque = value.isPressed;
+    }
+
+    // Super attaque (E)
+    public void OnSuperAttaque(InputValue value)
+    {
+        superAttaque = value.isPressed;
+    }
+
+    // Block avec le bouclier (Right Click)
+    public void OnBloquer(InputValue value)
+    {
+        bloquer = value.isPressed;
     }
 }

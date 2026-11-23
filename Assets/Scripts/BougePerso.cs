@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 
 public class BougePerso : MonoBehaviour
@@ -56,8 +55,8 @@ public class BougePerso : MonoBehaviour
 
     [Space(5)]
     [Header("Cinemachine")]
-    [Tooltip("GameObject que la Cinemachine va suivre")]
-    [SerializeField] private GameObject cibleCinemachine;
+    //[Tooltip("GameObject que la Cinemachine va suivre")]
+    //[SerializeField] private GameObject cibleCinemachine;
 
     [Tooltip("Nb de degrés de la caméra pour se déplacer vers le haut")]
     [SerializeField] private float maxMouvCamHaut = 90.0f;
@@ -71,8 +70,8 @@ public class BougePerso : MonoBehaviour
     [Tooltip("Vitesse de rotation de la caméra lorsque la souris atteint un bord")]
     [SerializeField] private float vitesseRotationBord = 100f;
 
-    // Cinémachines pour la 1re et 3e personne (cameraTP) ainsi que la caméra principale (cinemachineTP)
-    [SerializeField] private GameObject cinemachineFP;
+    // Cinémachine pour la 3e personne (cameraTP) ainsi que la caméra principale (cinemachineTP)
+    //[SerializeField] private GameObject cinemachineFP;
     [SerializeField] private GameObject cinemachineTP;
     [SerializeField] private GameObject cameraTP;
 
@@ -88,23 +87,14 @@ public class BougePerso : MonoBehaviour
 
 
     [Space(5)]
-    // Animator du perso ainsi que son arme et la mire
+    // Animator du perso
     [Header("Arme")]
     [SerializeField] private Animator animator;
-    [SerializeField] private GameObject arme;
-    [SerializeField] GameObject mire;
 
     // Délai pour ranger l'arme et booléen pour savoir si l'arme est équipée ou non
     private float cooldown;
     private bool equipe = false;
 
-
-    //[Space(5)]
-    //[Header("Panneaux")]
-    //[SerializeField] private GameObject panneauDebut;
-    //[SerializeField] private GameObject panneauInfos;
-    //[SerializeField] private GameObject panneauMaire;
-    //[SerializeField] private GameObject panneauLimites;
 
     //[Space(5)]
     //[Header("Coeurs")]
@@ -128,29 +118,12 @@ public class BougePerso : MonoBehaviour
 
     //[Space(5)]
     //[Header("Sons")]
-    // GameObjects avec les effets sonores des pièces
-    //[SerializeField] private GameObject piecesJaunes;
-    //[SerializeField] private GameObject piecesRouges;
-
-    // GameObjects avec les effets sonores du perso
+    // GameObject avec l'effet sonore du perso
     //[SerializeField] private GameObject ouch;
-    //[SerializeField] private GameObject tire;
-    //[SerializeField] private GameObject recharge;
 
-    // GameObject avec la musique stressante
-    //[SerializeField] private GameObject stress;
-
-    // Indique si la musique stressante a déjà été activée
-    //private bool musiqueStressActivee = false;
-
-    // AudioSource du tir, de la recharge, de la caméra principale et de la douleur
-    //private AudioSource audioTir;
-    //private AudioSource audioRecharge;
+    // AudioSources
     //private AudioSource audioPrincipal;
     //private AudioSource audioOuch;
-
-    // Indique si le perso est en train de recharger
-    private bool rechargementEnCours = false;
 
 
     [Space(5)]
@@ -159,13 +132,6 @@ public class BougePerso : MonoBehaviour
 
     // Temps où le perso pourra reprendre des dégâts
     private float prochainDegatPossible = 0f;
-
-    // Indique si la défaite a déjà été programmée
-    private bool defaiteEnAttente = false;
-
-    // Indique si la partie est terminée
-    private bool partieTerminee = false;
-
 
 
     [Space(5)]
@@ -179,22 +145,11 @@ public class BougePerso : MonoBehaviour
     // SO "InfosPerso" du perso
     [SerializeField] private InfosPerso infosPerso;
 
+    // Indique si la défaite a déjà été programmée
+    private bool defaiteEnAttente = false;
 
-    // Diamant
-    //[SerializeField] private GameObject diamant;
-
-    // Indique si le diamant est déjà apparu
-    //private bool diamantApparu = false;
-
-    // Indique si la victoire est en attente
-    private bool victoireEnAttente = false;
-
-
-    // Zone de texte avec le chrono
-    //[SerializeField] private TMP_Text temps;
-
-    // Temps actuel du chrono
-    float currentTime = 0f;
+    // Indique si la partie est terminée
+    private bool partieTerminee = false;
 
 
     // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -210,16 +165,11 @@ public class BougePerso : MonoBehaviour
         infosPerso.nbPV = 4;
         PointsVie();
 
-        // Met à jour le temps
-        currentTime = 120f;
-
         // Trouve les composantes du Character controller et le script "StarterAssetsInputs" du perso
         controller = GetComponent<CharacterController>();
         lesInputs = GetComponent<StarterAssetsInputs>();
 
-        // Récupère les AudioSources du tir, de la recharge et de la douleur
-        //audioTir = tire.GetComponent<AudioSource>();
-        //audioRecharge = recharge.GetComponent<AudioSource>();
+        // Récupère les AudioSources
         //audioOuch = ouch.GetComponent<AudioSource>();
 
         // Réinitialise les délais de saut
@@ -228,9 +178,6 @@ public class BougePerso : MonoBehaviour
         // Récupère l'AudioSource de la caméra principale
         //GameObject cameraPrincipale = GameObject.Find("Main Camera");
         //audioPrincipal = cameraPrincipale.GetComponent<AudioSource>();
-
-        // Désactive la musique stressante au début de la partie
-        //stress.SetActive(false);
 
         // Affiche le panneau du début
         //panneauDebut.SetActive(true);
@@ -254,35 +201,6 @@ public class BougePerso : MonoBehaviour
         // Sinon (quand on est 3e personne)
         else
             DirectionTP();
-
-        // Lance le chrono
-        //currentTime -= Time.deltaTime;
-
-        // Empêche le chrono de descendre sous 0
-        //currentTime = Mathf.Max(0f, currentTime);
-
-        // Met à jour la valeur du temps du perso
-        //temps.text = "Temps : " + currentTime.ToString("0");
-        //infosPerso.temps = (int)currentTime;
-
-        // Si le temps est inférieur ou égal à 30 secondes
-        //if (currentTime <= 30f && currentTime > 0f && !musiqueStressActivee)
-        //{
-        // Arrête la musique principale
-        //audioPrincipal.enabled = false;
-
-        // Active la musique stressante
-        //stress.SetActive(true);
-        //musiqueStressActivee = true;
-        //}
-
-        // Si le temps est écoulé
-        //if (currentTime <= 0f)
-        //{
-        // Exécute la méthode de défaite
-        //SceneDefaite();
-        //return;
-        //}
 
         // Exécute les méthodes suivantes à chaque frame
         Attaque();
@@ -399,7 +317,7 @@ public class BougePerso : MonoBehaviour
             niveauCinemachine = GrandeurAngle(niveauCinemachine, maxMouvCamBas, maxMouvCamHaut);
 
             // Met à jour les valeurs de la Cinemachine
-            cibleCinemachine.transform.localRotation = Quaternion.Euler(niveauCinemachine, 0.0f, 0.0f);
+            //cibleCinemachine.transform.localRotation = Quaternion.Euler(niveauCinemachine, 0.0f, 0.0f);
 
             // Permet au perso d'effectuer une rotation à gauche et à droite
             transform.Rotate(Vector3.up * rotationHorizontale);
@@ -488,29 +406,29 @@ public class BougePerso : MonoBehaviour
         lesInputs.attaque = false;
 
         // Empêche de tirer pendant la recharge
-        if (rechargementEnCours || partieTerminee)
-            return;
+        //if (rechargementEnCours || partieTerminee)
+        //return;
 
         // Commence la séquence de tir et de recharge
-        rechargementEnCours = true;
+        //rechargementEnCours = true;
 
         // Active le mode 1re personne
         equipe = true;
 
         // Active la caméra 1re personne
-        cinemachineFP.SetActive(true);
+        //cinemachineFP.SetActive(true);
 
         // Désactive la caméra 3e personne
-        cameraTP.SetActive(false);
+        //cameraTP.SetActive(false);
 
         // Active la mire
-        mire.SetActive(true);
+        //mire.SetActive(true);
 
         // Modifie l'animation du perso
-        animator.SetBool("Arme", true);
+        //animator.SetBool("Arme", true);
 
         // Rend l'arme visible
-        arme.SetActive(true);
+        //arme.SetActive(true);
 
         // Verrouille le curseur
         Cursor.lockState = CursorLockMode.Locked;
@@ -525,44 +443,44 @@ public class BougePerso : MonoBehaviour
         cooldown = 5f;
 
         // Position et direction de la mire
-        Vector3 positionDepart = mire.transform.position;
-        Vector3 directionTir = mire.transform.forward;
+        //Vector3 positionDepart = mire.transform.position;
+        //Vector3 directionTir = mire.transform.forward;
 
         // Récupère tous les colliders touchés par le tir
-        RaycastHit[] impacts = Physics.RaycastAll(positionDepart, directionTir, 20f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide);
+        //RaycastHit[] impacts = Physics.RaycastAll(positionDepart, directionTir, 20f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide);
 
         // Trie les impacts du plus proche au plus éloigné
-        System.Array.Sort(impacts, (a, b) => a.distance.CompareTo(b.distance));
+        //System.Array.Sort(impacts, (a, b) => a.distance.CompareTo(b.distance));
 
         // Parcourt les impacts dans l'ordre de distance
-        foreach (RaycastHit impact in impacts)
-        {
-            // Collisions
-            GameObject objetCollisions = impact.collider.gameObject;
+        //foreach (RaycastHit impact in impacts)
+        //{
+        // Collisions
+        //GameObject objetCollisions = impact.collider.gameObject;
 
-            // Ignore la zone de contact de l'ennemi
-            if (objetCollisions.CompareTag("Ennemi"))
-                continue;
+        // Ignore la zone de contact de l'ennemi
+        //if (objetCollisions.CompareTag("Ennemi"))
+        //continue;
 
-            // Si le tir touche le collider vulnérable d'un ennemi
-            if (objetCollisions.CompareTag("CollisionsEnnemis"))
-            {
-                // Détruit l'ennemi
-                Destroy(objetCollisions);
+        // Si le tir touche le collider vulnérable d'un ennemi
+        //if (objetCollisions.CompareTag("CollisionsEnnemis"))
+        //{
+        // Détruit l'ennemi
+        //Destroy(objetCollisions);
 
-                // Augmente de 1 le nb d'ennemis tués du perso
-                infosPerso.nbEnnemis++;
+        // Augmente de 1 le nb d'ennemis tués du perso
+        //infosPerso.nbEnnemis++;
 
-                // Permet de savoir le nb d'ennemis tués par le perso dans la console
-                Debug.Log(infosPerso.nbEnnemis + " ennemis");
+        // Permet de savoir le nb d'ennemis tués par le perso dans la console
+        //Debug.Log(infosPerso.nbEnnemis + " ennemis");
 
-                // Arrête la boucle
-                break;
-            }
+        // Arrête la boucle
+        //break;
+        //}
 
-            // Si un autre objet est touché, le tir est bloqué
-            break;
-        }
+        // Si un autre objet est touché, le tir est bloqué
+        //break;
+        //}
     }
 
     // Gestion du retour à la caméra 3e personne
@@ -581,19 +499,19 @@ public class BougePerso : MonoBehaviour
                 equipe = false;
 
                 // Désactive la caméra 1re personne
-                cinemachineFP.SetActive(false);
+                //cinemachineFP.SetActive(false);
 
                 // Réactive la caméra 3e personne
-                cameraTP.SetActive(true);
+                //cameraTP.SetActive(true);
 
                 // Désactive la mire
-                mire.SetActive(false);
+                //mire.SetActive(false);
 
                 // Déséquipe l'arme
-                arme.SetActive(false);
+                //arme.SetActive(false);
 
                 // Modifie l'animation du perso
-                animator.SetBool("Arme", false);
+                //animator.SetBool("Arme", false);
 
                 // Déverrouille le curseur
                 Cursor.lockState = CursorLockMode.Confined;
@@ -743,10 +661,6 @@ public class BougePerso : MonoBehaviour
         // Collision avec les ennemis
         if (collision.CompareTag("Ennemi"))
         {
-            // Ignore les dégâts si la victoire est en attente
-            if (victoireEnAttente)
-                return;
-
             // Ignore les dégâts pendant l'invincibilité
             if (Time.time < prochainDegatPossible)
                 return;
@@ -771,18 +685,8 @@ public class BougePerso : MonoBehaviour
         // Collision avec le diamant
         if (collision.CompareTag("Diamant"))
         {
-            // Empêche de déclencher plusieurs fois la victoire
-            if (victoireEnAttente)
-                return;
-
-            // Met la victoire en attente
-            victoireEnAttente = true;
-
             // Annule une éventuelle défaite programmée
             CancelInvoke(nameof(SceneDefaite));
-
-            // Arrête les ennemis
-            ArreterEnnemis();
 
             // Récupère l'AudioSource du diamant
             AudioSource sonDiamant = collision.GetComponent<AudioSource>();
@@ -861,38 +765,21 @@ public class BougePerso : MonoBehaviour
         //stress.SetActive(false);
 
         // Charge la scène correspondante
-        SceneManager.LoadScene(nomScene);
-    }
-
-
-    // Arrête les déplacements de tous les ennemis
-    void ArreterEnnemis()
-    {
-        //NavMeshAgent[] ennemis = FindObjectsByType<NavMeshAgent>(FindObjectsSortMode.None);
-
-        //foreach (NavMeshAgent ennemi in ennemis)
-        //{
-        //ennemi.isStopped = true;
-        //ennemi.ResetPath();
-        //}
+        //SceneManager.LoadScene(nomScene);
     }
 
 
     // Aller à la scène de victoire
     void SceneVictoire()
     {
-        TerminerPartie("Victory");
+        //TerminerPartie("Victory");
     }
 
 
     // Aller à la scène de défaite
     void SceneDefaite()
     {
-        // Si la victoire est en attente, ignore cette méthode
-        if (victoireEnAttente)
-            return;
-
-        TerminerPartie("Defeat");
+        //TerminerPartie("Defeat");
     }
 
 

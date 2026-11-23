@@ -38,18 +38,38 @@
                 },
                 {
                     "name": "Cours",
-                    "type": "Value",
+                    "type": "Button",
                     "id": "c98d12dc-16ae-49f8-876e-92902afcd31c",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": true,
+                    "initialStateCheck": false,
                     "priority": 0
                 },
                 {
                     "name": "Attaque",
                     "type": "Button",
                     "id": "711fa638-8dd1-459c-8bc4-0203cc738a23",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
+                    "name": "Super Attaque",
+                    "type": "Button",
+                    "id": "70c9e55c-026b-4a0a-be66-9d96751f2ec2",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
+                    "name": "Bloquer",
+                    "type": "Button",
+                    "id": "d6adb4a0-ba38-4feb-9e12-9a0d40fa1e30",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -193,11 +213,33 @@
                 {
                     "name": "",
                     "id": "b19f666c-e7b4-4058-afc3-7aabaf08d4a1",
-                    "path": "<Mouse>/rightButton",
+                    "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "Attaque",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7ff45231-8c81-476b-b346-2b80cd6b613e",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Super Attaque",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "85fd7ba4-90cc-4647-8419-81b66055a3b9",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Bloquer",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

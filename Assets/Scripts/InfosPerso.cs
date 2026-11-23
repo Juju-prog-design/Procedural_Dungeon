@@ -8,13 +8,13 @@ using UnityEngine;
 public class InfosPerso : ScriptableObject
 {
     // Nom du perso
-    public string nomPerso;
+    //public string nomPerso;
 
     // Nb d'ennemis tués par le perso
     public int nbEnnemis;
 
     // Temps du chrono
-    public int temps;
+    //public int temps;
 
     // Nb de PV du perso
     public int nbPV;
