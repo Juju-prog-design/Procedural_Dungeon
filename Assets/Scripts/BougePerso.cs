@@ -10,9 +10,6 @@ public class BougePerso : MonoBehaviour
     [Tooltip("Vitesse de course du perso")]
     [SerializeField] private float vitesseCourse = 15.0f;
 
-    [Tooltip("Vitesse de rotation du perso")]
-    [SerializeField] private float vitesseRotation = 1.0f;
-
     [Tooltip("Accélération et décélération du perso")]
     [SerializeField] private float accelerationDeceleration = 10.0f;
 
@@ -73,6 +70,9 @@ public class BougePerso : MonoBehaviour
     // Vélocité horizontale actuelle du perso
     private Vector3 vitesseHorizontaleActuelle;
 
+    // Vélocité actuelle de rotation du perso
+    private float vitesseRotationActuelle;
+
 
     //[Space(5)]
     //[Header("Coeurs")]
@@ -121,9 +121,8 @@ public class BougePerso : MonoBehaviour
     // Est appelée au lancement de la scène
     void Start()
     {
-        // Réinitialise les valeurs du nb de pièces, des ennemis tués, de PV et le chrono au lancement de la scène
-        infosPerso.nbPieces = 0;
-        infosPerso.nbEnnemis = 0;
+        // Verrouille le curseur
+        Cursor.lockState = CursorLockMode.Confined;
 
         // Met à jour l'affichage initial des PV
         infosPerso.nbPV = 4;
@@ -133,13 +132,11 @@ public class BougePerso : MonoBehaviour
         controller = GetComponent<CharacterController>();
         lesInputs = GetComponent<StarterAssetsInputs>();
 
-        // Récupère les AudioSources
-        //audioOuch = ouch.GetComponent<AudioSource>();
-
         // Réinitialise les délais de saut
         sautTimeout = delaiSaut;
 
-        // Récupère l'AudioSource de la caméra principale
+        // Récupère l'AudioSource de la caméra principale et du perso
+        //audioOuch = ouch.GetComponent<AudioSource>();
         //GameObject cameraPrincipale = GameObject.Find("Main Camera");
         //audioPrincipal = cameraPrincipale.GetComponent<AudioSource>();
 
@@ -147,7 +144,7 @@ public class BougePerso : MonoBehaviour
         //panneauDebut.SetActive(true);
 
         // Invoque la méthode "EnleverPanneaux" dans 3 secondes
-        Invoke(nameof(EnleverPanneaux), 3f);
+        //Invoke(nameof(EnleverPanneaux), 3f);
     }
 
 
@@ -158,34 +155,54 @@ public class BougePerso : MonoBehaviour
         if (partieTerminee)
             return;
 
-        // Si le booléen "equipe" est à vrai (quand on est en 1re personne)
-        if (equipe)
-            Bouge();
-
-        // Sinon (quand on est 3e personne)
-        else
-            DirectionTP();
-
         // Exécute les méthodes suivantes à chaque frame
-        Attaque();
-        RetourCameraTP();
         VerifierSol();
+        Bouge();
+        Attaque();
+        Bloquer();
         SautEtGravite();
-        //DebutAnim();
-        //DiamantApparu();
     }
 
 
     // Est appelée après que les fcts dans Update soient exécutées
     void LateUpdate()
     {
-        // Si le booléen "equipe" est à vrai (quand on est en 1re personne)
-        if (equipe)
-            RotationCamera();
+
     }
 
 
     // -----------------------------------------------------------------------CINEMACHINES + BOUGE------------------------------------------------------------------
+
+    // Déplacement du perso en 3e personne
+    private void Bouge()
+    {
+        // Récupère les entrées du perso
+        Vector2 direction = lesInputs.bouge;
+
+        // Détermine la vitesse souhaitée
+        float vitesseVoulue = lesInputs.cours ? vitesseCourse : vitesseMarche;
+
+        // Récupère l'orientation horizontale de la caméra
+        float angleCamera = cameraTP.transform.eulerAngles.y;
+
+        // Calcule la direction du déplacement selon la caméra
+        Vector3 directionDeplacement = Quaternion.Euler(0f, angleCamera, 0f) * new Vector3(direction.x, 0f, direction.y);
+
+        // Normalise la direction pour éviter une vitesse diagonale supérieure
+        directionDeplacement.Normalize();
+
+        // Détermine la rotation souhaitée du perso
+        if (directionDeplacement.sqrMagnitude > 0.01f)
+        {
+            float angleCible = Mathf.Atan2(directionDeplacement.x, directionDeplacement.z) * Mathf.Rad2Deg;
+            float angleActuel = Mathf.SmoothDampAngle(transform.eulerAngles.y, angleCible, ref vitesseRotationActuelle, 0.1f);
+            transform.rotation = Quaternion.Euler(0f, angleActuel, 0f);
+        }
+
+        // Déplace le perso
+        Deplacer(directionDeplacement, vitesseVoulue);
+    }
+
 
     // Accélération, décélération et déplacement du perso
     void Deplacer(Vector3 direction, float vitesseVoulue)
@@ -194,15 +211,14 @@ public class BougePerso : MonoBehaviour
         Vector3 vitesseVoulueHorizontale = direction * vitesseVoulue;
 
         // Détermine si le perso change de direction
-        bool changeDirection = vitesseVoulueHorizontale.sqrMagnitude > 0.01f && vitesseHorizontaleActuelle.sqrMagnitude > 0.01f &&
-            Vector3.Dot(vitesseHorizontaleActuelle.normalized, vitesseVoulueHorizontale.normalized) < 0.95f;
+        bool changeDirection = vitesseVoulueHorizontale.sqrMagnitude > 0.01f &&
+            vitesseHorizontaleActuelle.sqrMagnitude > 0.01f && Vector3.Dot(vitesseHorizontaleActuelle.normalized, vitesseVoulueHorizontale.normalized) < 0.95f;
 
         // Détermine la vitesse de changement
         float vitesseChangement;
 
         if (vitesseVoulueHorizontale == Vector3.zero || changeDirection)
             vitesseChangement = deceleration;
-
         else
             vitesseChangement = accelerationDeceleration;
 
@@ -212,8 +228,17 @@ public class BougePerso : MonoBehaviour
         // Calcule la vitesse actuelle du perso
         float vitesse = vitesseHorizontaleActuelle.magnitude;
 
+        // Détermine le seuil maximal de l'animation selon le déplacement
+        float seuilVitesse = Mathf.Approximately(vitesseVoulue, vitesseCourse) ? 6.0f : 2.0f;
+
+        // Calcule la progression de la vitesse entre 0 et 1
+        float progressionVitesse = vitesseVoulue > 0.0f ? Mathf.Clamp01(vitesse / vitesseVoulue) : 0.0f;
+
+        // Détermine la valeur à transmettre à l'Animator
+        float vitesseAnimation = progressionVitesse * seuilVitesse;
+
         // Rend plus fluide le changement de vitesse de l'animation
-        changementVitesse = Mathf.Lerp(changementVitesse, vitesse, Time.deltaTime * accelerationDeceleration);
+        changementVitesse = Mathf.Lerp(changementVitesse, vitesseAnimation, Time.deltaTime * accelerationDeceleration);
 
         // Si le changement de vitesse est plus petit que 0.01, met sa valeur à 0
         if (changementVitesse < 0.01f)
@@ -227,313 +252,56 @@ public class BougePerso : MonoBehaviour
     }
 
 
-    // Permet à la caméra 3e personne de bouger
-    void DirectionTP()
-    {
-        // Valeurs des mouvements horizontaux et verticaux de la caméra
-        float gaucheDroite = lesInputs.bouge.x;
-        float avantArriere = lesInputs.bouge.y;
-
-        // Détermine si le perso marche ou cours
-        float vitesseVoulue = lesInputs.cours ? vitesseCourse : vitesseMarche;
-
-        // Si y'a pas de mouvement, mettre la vitesse du perso à 0
-        if (lesInputs.bouge == Vector2.zero)
-            vitesseVoulue = 0.0f;
-
-        // Normalise les valeurs de mouvements
-        Vector3 direction = new Vector3(gaucheDroite, 0.0f, avantArriere).normalized;
-
-        // Si le perso se déplace
-        if (direction != Vector3.zero)
-        {
-            // Angle voulu pour faire rotater le perso
-            float angleVoulu = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cinemachineTP.transform.eulerAngles.y;
-
-            // Angle de rotation du perso
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, angleVoulu, ref ajusteVelocityRotation, ajusteTempsRotation);
-
-            // Rotate le perso
-            transform.rotation = Quaternion.Euler(0f, angle, 0f);
-
-            // Direction du mouvement selon l'angle de rotation
-            direction = (Quaternion.Euler(0f, angleVoulu, 0f) * Vector3.forward).normalized;
-        }
-
-        // Valeurs de déplacement
-        Deplacer(direction, vitesseVoulue);
-    }
-
-
-    // Rotation de la caméra quand le perso est en mode 1re personne
-    void RotationCamera()
-    {
-        // Détecte si il y a un mouvement de la caméra
-        if (lesInputs.regarder.sqrMagnitude >= seuil)
-        {
-            // Rotation verticale de la caméra
-            niveauCinemachine += lesInputs.regarder.y * vitesseRotation;
-
-            // Rotation horizontale du perso
-            float rotationHorizontale = lesInputs.regarder.x * vitesseRotation;
-
-            // Met à jour les valeurs des angles possibles que la Cinemachine peut faire
-            niveauCinemachine = GrandeurAngle(niveauCinemachine, maxMouvCamBas, maxMouvCamHaut);
-
-            // Met à jour les valeurs de la Cinemachine
-            //cibleCinemachine.transform.localRotation = Quaternion.Euler(niveauCinemachine, 0.0f, 0.0f);
-
-            // Permet au perso d'effectuer une rotation à gauche et à droite
-            transform.Rotate(Vector3.up * rotationHorizontale);
-        }
-
-        // Rotation supplémentaire lorsque la souris atteint les bords de l'écran
-        if (Cursor.lockState == CursorLockMode.Confined)
-        {
-            // Bord gauche
-            if (Input.mousePosition.x <= zoneBordEcran)
-                transform.Rotate(Vector3.up * (-vitesseRotationBord * Time.deltaTime));
-
-            // Bord droit
-            else if (Input.mousePosition.x >= Screen.width - zoneBordEcran)
-                transform.Rotate(Vector3.up * (vitesseRotationBord * Time.deltaTime));
-        }
-    }
-
-
-    // Détermine les angles possibles que la Cinemachine peut faire
-    static float GrandeurAngle(float angle, float angleMin, float angleMax)
-    {
-        return Mathf.Clamp(angle, angleMin, angleMax);
-    }
-
-
-    // Permet au perso de bouger quand il est en mode 1re personne
-    void Bouge()
-    {
-        // Détermine si le perso marche ou cours
-        float vitesseVoulue = lesInputs.cours ? vitesseCourse : vitesseMarche;
-
-        // Si y'a pas de mouvement, mettre la vitesse du perso à 0
-        if (lesInputs.bouge == Vector2.zero)
-            vitesseVoulue = 0.0f;
-
-        // Direction du déplacement selon l'orientation du perso
-        Vector3 direction = transform.right * lesInputs.bouge.x + transform.forward * lesInputs.bouge.y;
-
-        // Normalise la direction pour conserver une vitesse constante en diagonale
-        direction = direction.normalized;
-
-        // Valeurs de déplacement
-        Deplacer(direction, vitesseVoulue);
-    }
-
-
-    // --------------------------------------------------------------------ANIMS------------------------------------------------------------------------
-
-    // Début de l'animation de saut du perso
-    //void DebutAnim()
-    //{
-    // Si on appuie sur "espace" pour faire sauter le perso ET que celui-ci touche au sol (valeur à vrai) ET que le booléen "debutAnim" est à faux
-    //if (lesInputs.saute && toucheSol && debutAnim == false)
-    //{
-    // Rend le booléen "debutAnim" à vrai
-    //debutAnim = true;
-
-    // Enclenche le trigger "Saut" de l'Animator du perso
-    //animator.SetTrigger("Saut");
-    //}
-    //}
-
-
-    // Fin de l'animation de saut du perso
-    //public void FinAnim(float valeur)
-    //{
-    // La valeur de la hauteur du saut du perso est la valeur (valeur) donnée dans le script "GestionAnims"
-    //hauteurSaut = valeur;
-
-    // Rend le booléen "debutAnim" à faux (pour que la méthode "DebutAnim" puisse être exécutée à nouveau)
-    //debutAnim = false;
-    //}
-
-
     // ------------------------------------------------------------------------ATTAQUE----------------------------------------------------------------
 
-    // Attaque avec l'arme du perso
+    // Gestion des attaques du perso
     void Attaque()
     {
-        // Si le perso ne tire pas, ne rien faire
-        if (!lesInputs.attaque)
-            return;
-
-        // Réinitialise l'input pour éviter un tir automatique après la recharge
-        lesInputs.attaque = false;
-
-        // Empêche de tirer pendant la recharge
-        //if (rechargementEnCours || partieTerminee)
-        //return;
-
-        // Commence la séquence de tir et de recharge
-        //rechargementEnCours = true;
-
-        // Active le mode 1re personne
-        equipe = true;
-
-        // Active la caméra 1re personne
-        //cinemachineFP.SetActive(true);
-
-        // Désactive la caméra 3e personne
-        //cameraTP.SetActive(false);
-
-        // Active la mire
-        //mire.SetActive(true);
-
-        // Modifie l'animation du perso
-        //animator.SetBool("Arme", true);
-
-        // Rend l'arme visible
-        //arme.SetActive(true);
-
-        // Verrouille le curseur
-        Cursor.lockState = CursorLockMode.Locked;
-
-        // Active l'AudioSource du tir
-        //audioTir.enabled = true;
-
-        // Programme la fin du tir
-        //Invoke(nameof(FiniTir), audioTir.clip.length);
-
-        // Délai pour retourner à la caméra 3e personne
-        cooldown = 5f;
-
-        // Position et direction de la mire
-        //Vector3 positionDepart = mire.transform.position;
-        //Vector3 directionTir = mire.transform.forward;
-
-        // Récupère tous les colliders touchés par le tir
-        //RaycastHit[] impacts = Physics.RaycastAll(positionDepart, directionTir, 20f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide);
-
-        // Trie les impacts du plus proche au plus éloigné
-        //System.Array.Sort(impacts, (a, b) => a.distance.CompareTo(b.distance));
-
-        // Parcourt les impacts dans l'ordre de distance
-        //foreach (RaycastHit impact in impacts)
-        //{
-        // Collisions
-        //GameObject objetCollisions = impact.collider.gameObject;
-
-        // Ignore la zone de contact de l'ennemi
-        //if (objetCollisions.CompareTag("Ennemi"))
-        //continue;
-
-        // Si le tir touche le collider vulnérable d'un ennemi
-        //if (objetCollisions.CompareTag("CollisionsEnnemis"))
-        //{
-        // Détruit l'ennemi
-        //Destroy(objetCollisions);
-
-        // Augmente de 1 le nb d'ennemis tués du perso
-        //infosPerso.nbEnnemis++;
-
-        // Permet de savoir le nb d'ennemis tués par le perso dans la console
-        //Debug.Log(infosPerso.nbEnnemis + " ennemis");
-
-        // Arrête la boucle
-        //break;
-        //}
-
-        // Si un autre objet est touché, le tir est bloqué
-        //break;
-        //}
-    }
-
-    // Gestion du retour à la caméra 3e personne
-    void RetourCameraTP()
-    {
-        // Si le perso est en 1re personne
-        if (equipe)
+        // Attaque normale
+        if (lesInputs.attaque)
         {
-            // Diminue le délai de retour
-            cooldown -= Time.deltaTime;
+            animator.SetTrigger("Attack");
+            lesInputs.attaque = false;
+        }
 
-            // Si le délai est terminé
-            if (cooldown <= 0f)
-            {
-                // Désactive le mode 1re personne
-                equipe = false;
-
-                // Désactive la caméra 1re personne
-                //cinemachineFP.SetActive(false);
-
-                // Réactive la caméra 3e personne
-                //cameraTP.SetActive(true);
-
-                // Désactive la mire
-                //mire.SetActive(false);
-
-                // Déséquipe l'arme
-                //arme.SetActive(false);
-
-                // Modifie l'animation du perso
-                //animator.SetBool("Arme", false);
-
-                // Déverrouille le curseur
-                Cursor.lockState = CursorLockMode.Confined;
-            }
+        // Super attaque
+        if (lesInputs.superAttaque)
+        {
+            animator.SetTrigger("SuperAttack");
+            lesInputs.superAttaque = false;
         }
     }
 
 
-    // Termine le son du tir
-    void FiniTir()
+    // ------------------------------------------------------------------------BLOCK----------------------------------------------------------------
+
+    // Gestion du blocage avec le bouclier
+    void Bloquer()
     {
-        // Arrête le son du tir
-        //audioTir.enabled = false;
+        // Vérifie si le perso est en train d'attaquer
+        bool attaqueEnCours = animator.GetCurrentAnimatorStateInfo(0).IsTag("Attack");
 
-        // Commence la recharge
-        //Recharge();
-    }
+        // Détermine si le perso peut bloquer
+        bool peutBloquer = toucheSol && !attaqueEnCours;
 
-
-    // Recharger l'arme du perso
-    void Recharge()
-    {
-        // Active l'AudioSource de recharge
-        //audioRecharge.enabled = true;
-
-        // Attend la durée complète du son
-        //Invoke(nameof(DesactiveRecharge), audioRecharge.clip.length);
-    }
-
-
-    // Termine la recharge
-    void DesactiveRecharge()
-    {
-        // Arrête le son de recharge
-        //audioRecharge.enabled = false;
-
-        // Autorise un nouveau tir
-        //rechargementEnCours = false;
-    }
-
-
-    // Désactive l'Audio source des pièces et de la douleur du perso
-    void DesactiveSons()
-    {
-        //piecesJaunes.GetComponent<AudioSource>().enabled = false;
-        //piecesRouges.GetComponent<AudioSource>().enabled = false;
-        //audioOuch.enabled = false;
+        // Active ou désactive le blocage
+        animator.SetBool("IsBlocking", lesInputs.bloquer && peutBloquer);
     }
 
 
     // ------------------------------------------------------------------------DÉSACTIVATION----------------------------------------------------------------
 
+    // Désactive l'Audio source des pièces et de la douleur du perso
+    void DesactiveSons()
+    {
+        //audioOuch.enabled = false;
+    }
+
+
     // Enlève les panneaux actifs
     void EnleverPanneaux()
     {
         //panneauDebut.SetActive(false);
-        //panneauInfos.SetActive(false);
-        //panneauMaire.SetActive(false);
         //panneauLimites.SetActive(false);
     }
 
@@ -543,74 +311,6 @@ public class BougePerso : MonoBehaviour
     // Quand le perso entre en collision avec qq
     void OnTriggerEnter(Collider collision)
     {
-        // Pièces jaunes
-        if (collision.CompareTag("PiecesJaunes"))
-        {
-            // Active l'Audio source des pièces
-            //piecesJaunes.GetComponent<AudioSource>().enabled = true;
-
-            // Détruit la pièce
-            Destroy(collision.gameObject);
-
-            // Augmente le nb de pièces du perso de 1
-            infosPerso.nbPieces++;
-
-            // Permet de savoir le nb de pièces par le perso dans la console
-            Debug.Log(infosPerso.nbPieces + " pièces");
-
-            // Invoque la méthode "DesactiveSons" dans 1 seconde
-            Invoke(nameof(DesactiveSons), 1f);
-        }
-
-
-        // Pièces rouges
-        if (collision.CompareTag("PiecesRouges"))
-        {
-            // Active l'Audio source des pièces
-            //piecesRouges.GetComponent<AudioSource>().enabled = true;
-
-            // Détruit la pièce
-            Destroy(collision.gameObject);
-
-            // Augmente le nb de pièces du perso de 1
-            infosPerso.nbPieces++;
-
-            // Augmente le nb de PV du perso de 1
-            infosPerso.nbPV++;
-
-            // Met à jour l'affichage des PV
-            PointsVie();
-
-            // Permet de savoir le nb de pièces par le perso dans la console
-            Debug.Log(infosPerso.nbPieces + " pièces");
-
-            // Invoque la méthode "DesactiveSons" dans 1 seconde
-            Invoke(nameof(DesactiveSons), 1f);
-        }
-
-
-        // Panneau au centre du village
-        if (collision.CompareTag("panneauInfos"))
-        {
-            // Affiche le panneau
-            //panneauInfos.SetActive(true);
-
-            // Invoque la méthode "EnleverPanneaux" dans 2 secondes
-            Invoke(nameof(EnleverPanneaux), 2f);
-        }
-
-
-        // Panneau de la maison du maire
-        if (collision.CompareTag("panneauMaire"))
-        {
-            // Affiche le panneau
-            //panneauMaire.SetActive(true);
-
-            // Invoque la méthode "EnleverPanneaux" dans 2 secondes
-            Invoke(nameof(EnleverPanneaux), 2f);
-        }
-
-
         // Murs limites du terrain
         if (collision.CompareTag("mursLimites"))
         {
@@ -643,27 +343,6 @@ public class BougePerso : MonoBehaviour
 
             // Désactive les sons temporaires après 1 seconde
             Invoke(nameof(DesactiveSons), 1f);
-        }
-
-
-        // Collision avec le diamant
-        if (collision.CompareTag("Diamant"))
-        {
-            // Annule une éventuelle défaite programmée
-            CancelInvoke(nameof(SceneDefaite));
-
-            // Récupère l'AudioSource du diamant
-            AudioSource sonDiamant = collision.GetComponent<AudioSource>();
-
-            // Joue le son sans dépendre de l'objet qui va être détruit
-            if (sonDiamant != null && sonDiamant.clip != null)
-                AudioSource.PlayClipAtPoint(sonDiamant.clip, collision.transform.position);
-
-            // Fait disparaître le diamant
-            Destroy(collision.gameObject);
-
-            // Lance la victoire après 1 seconde
-            Invoke(nameof(SceneVictoire), 1f);
         }
     }
 
@@ -701,20 +380,6 @@ public class BougePerso : MonoBehaviour
 
     // ------------------------------------------------------------------------VICTOIRE + DÉFAITE--------------------------------------------------------
 
-    // Quand le perso a ramassé toutes les pièces et tué tous les ennemis
-    void DiamantApparu()
-    {
-        //if (infosPerso.nbPieces == 10 && infosPerso.nbEnnemis == 10 && !diamantApparu && diamant != null)
-        //{
-        // Active le diamant
-        //diamant.SetActive(true);
-
-        // Empêche de tenter de l'activer à nouveau
-        //diamantApparu = true;
-        //}
-    }
-
-
     // Termine la partie et charge la scène correspondante
     void TerminerPartie(string nomScene)
     {
@@ -726,7 +391,6 @@ public class BougePerso : MonoBehaviour
 
         // Arrête les musiques
         //audioPrincipal.enabled = false;
-        //stress.SetActive(false);
 
         // Charge la scène correspondante
         //SceneManager.LoadScene(nomScene);
@@ -757,18 +421,21 @@ public class BougePerso : MonoBehaviour
 
         // Vérifie si la sphère touche le sol
         toucheSol = Physics.CheckSphere(spherePosition, GroundedRadius, layerSol, QueryTriggerInteraction.Ignore);
+
+        // Met à jour l'Animator
+        animator.SetBool("IsGrounded", toucheSol);
     }
 
 
-    // Permet au perso de sauter
+    // Permet au perso de sauter et applique la gravité
     void SautEtGravite()
     {
-        // Vitesse finale
+        // Vitesse maximale de chute
         float vitesseFinale = -53.0f;
 
         // Applique la gravité sans dépasser la vitesse maximale de chute
         if (vitesseVerticale > vitesseFinale)
-            vitesseVerticale = Mathf.Max(vitesseVerticale + Gravite * Time.deltaTime, vitesseFinale);
+            vitesseVerticale = Mathf.Max(vitesseVerticale + gravite * Time.deltaTime, vitesseFinale);
 
         // Si le perso touche au sol
         if (toucheSol)
@@ -777,23 +444,30 @@ public class BougePerso : MonoBehaviour
             if (vitesseVerticale < 0.0f)
                 vitesseVerticale = -2f;
 
-            // Si on appuie sur la barre d'espace ET que le délai pour sauter à nouveau est de 0 : Saute
+            // Si on appuie sur la barre d'espace et que le délai est terminé : saute
             if (lesInputs.saute && sautTimeout <= 0.0f)
-                vitesseVerticale = Mathf.Sqrt(hauteurSaut * -2f * Gravite);
+            {
+                vitesseVerticale = Mathf.Sqrt(hauteurSaut * -2f * gravite);
+                animator.SetBool("IsJumping", true);
+                lesInputs.saute = false;
+            }
 
-            // Enclenche le délai pour sauter à nouveau
-            if (sautTimeout >= 0.0f)
+            // Diminue le délai pour sauter à nouveau
+            if (sautTimeout > 0.0f)
                 sautTimeout -= Time.deltaTime;
         }
 
-        // Sinon
         else
         {
             // Réinitialise le délai pour sauter à nouveau
             sautTimeout = delaiSaut;
 
-            // Si le perso ne touche pas au sol : ne Saute PAS
+            // Ignore une nouvelle pression de saut pendant que le perso est en l'air
             lesInputs.saute = false;
         }
+
+        // Termine l'état de saut lorsque le perso retouche le sol
+        if (toucheSol && vitesseVerticale <= 0.0f)
+            animator.SetBool("IsJumping", false);
     }
 }
