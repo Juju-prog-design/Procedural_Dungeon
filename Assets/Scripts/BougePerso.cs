@@ -113,7 +113,7 @@ public class BougePerso : MonoBehaviour
     private bool defaiteEnAttente = false;
 
     // Indique si la partie est terminée
-    private bool partieTerminee = false;
+    //private bool partieTerminee = false;
 
 
     // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -152,8 +152,8 @@ public class BougePerso : MonoBehaviour
     void Update()
     {
         // Arrête l'exécution si la partie est terminée
-        if (partieTerminee)
-            return;
+        //if (partieTerminee)
+        //return;
 
         // Exécute les méthodes suivantes à chaque frame
         VerifierSol();
@@ -373,7 +373,7 @@ public class BougePerso : MonoBehaviour
         if (infosPerso.nbPV == 0 && !defaiteEnAttente)
         {
             defaiteEnAttente = true;
-            Invoke(nameof(SceneDefaite), 1f);
+            //Invoke(nameof(SceneDefaite), 1f);
         }
     }
 
@@ -381,34 +381,34 @@ public class BougePerso : MonoBehaviour
     // ------------------------------------------------------------------------VICTOIRE + DÉFAITE--------------------------------------------------------
 
     // Termine la partie et charge la scène correspondante
-    void TerminerPartie(string nomScene)
-    {
-        // Empêche de terminer la partie plusieurs fois
-        if (partieTerminee)
-            return;
+    //void TerminerPartie(string nomScene)
+    //{
+    // Empêche de terminer la partie plusieurs fois
+    //if (partieTerminee)
+    //return;
 
-        partieTerminee = true;
+    //partieTerminee = true;
 
-        // Arrête les musiques
-        //audioPrincipal.enabled = false;
+    // Arrête les musiques
+    //audioPrincipal.enabled = false;
 
-        // Charge la scène correspondante
-        //SceneManager.LoadScene(nomScene);
-    }
+    // Charge la scène correspondante
+    //SceneManager.LoadScene(nomScene);
+    //}
 
 
     // Aller à la scène de victoire
-    void SceneVictoire()
-    {
-        //TerminerPartie("Victory");
-    }
+    //void SceneVictoire()
+    //{
+    //TerminerPartie("Victory");
+    //}
 
 
     // Aller à la scène de défaite
-    void SceneDefaite()
-    {
-        //TerminerPartie("Defeat");
-    }
+    //void SceneDefaite()
+    //{
+    //TerminerPartie("Defeat");
+    //}
 
 
     // ------------------------------------------------------------------------SAUT-------------------------------------------------------------------
