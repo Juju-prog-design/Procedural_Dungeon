@@ -25,17 +25,14 @@ public class BougePerso : MonoBehaviour
     [Tooltip("Hauteur du saut du perso")]
     [SerializeField] private float hauteurSaut = 1.2f;
 
-    [Tooltip("Valeur de gravité (défaut = -9.81f)")]
-    [SerializeField] private float Gravite = -15.0f;
+    [Tooltip("Valeur de gravité")]
+    [SerializeField] private float gravite = -15.0f;
 
     [Tooltip("Temps nécessaire pour sauter à nouveau")]
     [SerializeField] private float delaiSaut = 0.1f;
 
     // Délai nécessaire pour sauter à nouveau
     private float sautTimeout;
-
-    // Booléen pour savoir le début de l'animation de saut (avec et sans arme)
-    private bool debutAnim = false;
 
 
     [Space(5)]
@@ -55,53 +52,14 @@ public class BougePerso : MonoBehaviour
 
     [Space(5)]
     [Header("Cinemachine")]
-    //[Tooltip("GameObject que la Cinemachine va suivre")]
-    //[SerializeField] private GameObject cibleCinemachine;
-
-    [Tooltip("Nb de degrés de la caméra pour se déplacer vers le haut")]
-    [SerializeField] private float maxMouvCamHaut = 90.0f;
-
-    [Tooltip("Nb de degrés de la caméra pour se déplacer vers le bas")]
-    [SerializeField] private float maxMouvCamBas = -90.0f;
-
-    [Tooltip("Largeur de la zone de détection aux bords de l'écran")]
-    [SerializeField] private float zoneBordEcran = 20f;
-
-    [Tooltip("Vitesse de rotation de la caméra lorsque la souris atteint un bord")]
-    [SerializeField] private float vitesseRotationBord = 100f;
-
-    // Cinémachine pour la 3e personne (cameraTP) ainsi que la caméra principale (cinemachineTP)
-    //[SerializeField] private GameObject cinemachineFP;
     [SerializeField] private GameObject cinemachineTP;
     [SerializeField] private GameObject cameraTP;
 
-    // Valeurs permettant d'ajuster la vélocité et le temps de rotation de la caméra 3e personne
-    [SerializeField] private float ajusteVelocityRotation = 0.1f;
-    [SerializeField] private float ajusteTempsRotation = 0.1f;
-
-    // Seuil de la caméra
-    private const float seuil = 0.01f;
-
-    // Rotation X de la Cinemachine
-    private float niveauCinemachine;
-
 
     [Space(5)]
+    [Header("Animator")]
     // Animator du perso
-    [Header("Arme")]
     [SerializeField] private Animator animator;
-
-    // Délai pour ranger l'arme et booléen pour savoir si l'arme est équipée ou non
-    private float cooldown;
-    private bool equipe = false;
-
-
-    //[Space(5)]
-    //[Header("Coeurs")]
-    //[SerializeField] private GameObject PV4;
-    //[SerializeField] private GameObject PV3;
-    //[SerializeField] private GameObject PV2;
-    //[SerializeField] private GameObject PV1;
 
 
     [Space(5)]
@@ -117,6 +75,20 @@ public class BougePerso : MonoBehaviour
 
 
     //[Space(5)]
+    //[Header("Coeurs")]
+    [Tooltip("Durée d'invincibilité après avoir reçu des dégâts")]
+    [SerializeField] private float dureeInvincibilite = 1.5f;
+
+    // Temps où le perso pourra reprendre des dégâts
+    private float prochainDegatPossible = 0f;
+
+    //[SerializeField] private GameObject PV4;
+    //[SerializeField] private GameObject PV3;
+    //[SerializeField] private GameObject PV2;
+    //[SerializeField] private GameObject PV1;
+
+
+    //[Space(5)]
     //[Header("Sons")]
     // GameObject avec l'effet sonore du perso
     //[SerializeField] private GameObject ouch;
@@ -124,14 +96,6 @@ public class BougePerso : MonoBehaviour
     // AudioSources
     //private AudioSource audioPrincipal;
     //private AudioSource audioOuch;
-
-
-    [Space(5)]
-    // Durée d'invincibilité
-    [SerializeField] private float dureeInvincibilite = 1.5f;
-
-    // Temps où le perso pourra reprendre des dégâts
-    private float prochainDegatPossible = 0f;
 
 
     [Space(5)]
@@ -207,7 +171,7 @@ public class BougePerso : MonoBehaviour
         RetourCameraTP();
         VerifierSol();
         SautEtGravite();
-        DebutAnim();
+        //DebutAnim();
         //DiamantApparu();
     }
 
@@ -368,29 +332,29 @@ public class BougePerso : MonoBehaviour
     // --------------------------------------------------------------------ANIMS------------------------------------------------------------------------
 
     // Début de l'animation de saut du perso
-    void DebutAnim()
-    {
-        // Si on appuie sur "espace" pour faire sauter le perso ET que celui-ci touche au sol (valeur à vrai) ET que le booléen "debutAnim" est à faux
-        if (lesInputs.saute && toucheSol && debutAnim == false)
-        {
-            // Rend le booléen "debutAnim" à vrai
-            debutAnim = true;
+    //void DebutAnim()
+    //{
+    // Si on appuie sur "espace" pour faire sauter le perso ET que celui-ci touche au sol (valeur à vrai) ET que le booléen "debutAnim" est à faux
+    //if (lesInputs.saute && toucheSol && debutAnim == false)
+    //{
+    // Rend le booléen "debutAnim" à vrai
+    //debutAnim = true;
 
-            // Enclenche le trigger "Saut" de l'Animator du perso
-            animator.SetTrigger("Saut");
-        }
-    }
+    // Enclenche le trigger "Saut" de l'Animator du perso
+    //animator.SetTrigger("Saut");
+    //}
+    //}
 
 
     // Fin de l'animation de saut du perso
-    public void FinAnim(float valeur)
-    {
-        // La valeur de la hauteur du saut du perso est la valeur (valeur) donnée dans le script "GestionAnims"
-        hauteurSaut = valeur;
+    //public void FinAnim(float valeur)
+    //{
+    // La valeur de la hauteur du saut du perso est la valeur (valeur) donnée dans le script "GestionAnims"
+    //hauteurSaut = valeur;
 
-        // Rend le booléen "debutAnim" à faux (pour que la méthode "DebutAnim" puisse être exécutée à nouveau)
-        debutAnim = false;
-    }
+    // Rend le booléen "debutAnim" à faux (pour que la méthode "DebutAnim" puisse être exécutée à nouveau)
+    //debutAnim = false;
+    //}
 
 
     // ------------------------------------------------------------------------ATTAQUE----------------------------------------------------------------
