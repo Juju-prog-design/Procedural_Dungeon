@@ -49,7 +49,6 @@ public class BougePerso : MonoBehaviour
 
     [Space(5)]
     [Header("Cinemachine")]
-    [SerializeField] private GameObject cinemachineTP;
     [SerializeField] private GameObject cameraTP;
 
 
@@ -75,17 +74,12 @@ public class BougePerso : MonoBehaviour
 
 
     //[Space(5)]
-    //[Header("Coeurs")]
+    //[Header("Pts de vie")]
     [Tooltip("Durée d'invincibilité après avoir reçu des dégâts")]
     [SerializeField] private float dureeInvincibilite = 1.5f;
 
     // Temps où le perso pourra reprendre des dégâts
     private float prochainDegatPossible = 0f;
-
-    //[SerializeField] private GameObject PV4;
-    //[SerializeField] private GameObject PV3;
-    //[SerializeField] private GameObject PV2;
-    //[SerializeField] private GameObject PV1;
 
 
     //[Space(5)]
@@ -113,7 +107,7 @@ public class BougePerso : MonoBehaviour
     private bool defaiteEnAttente = false;
 
     // Indique si la partie est terminée
-    //private bool partieTerminee = false;
+    private bool partieTerminee = false;
 
 
     // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -152,8 +146,8 @@ public class BougePerso : MonoBehaviour
     void Update()
     {
         // Arrête l'exécution si la partie est terminée
-        //if (partieTerminee)
-        //return;
+        if (partieTerminee)
+            return;
 
         // Exécute les méthodes suivantes à chaque frame
         VerifierSol();
@@ -161,13 +155,6 @@ public class BougePerso : MonoBehaviour
         Attaque();
         Bloquer();
         SautEtGravite();
-    }
-
-
-    // Est appelée après que les fcts dans Update soient exécutées
-    void LateUpdate()
-    {
-
     }
 
 
@@ -257,6 +244,26 @@ public class BougePerso : MonoBehaviour
     // Gestion des attaques du perso
     void Attaque()
     {
+        // Vérifie si le perso est en train de bloquer
+        bool blocageEnCours = animator.GetBool("IsBlocking");
+
+        // Vérifie si une attaque est en cours
+        bool attaqueEnCours = animator.GetCurrentAnimatorStateInfo(0).IsTag("Attack");
+
+        // Vérifie aussi la prochaine animation si une transition est en cours
+        if (animator.IsInTransition(0))
+        {
+            attaqueEnCours |= animator.GetNextAnimatorStateInfo(0).IsTag("Attack");
+        }
+
+        // Empêche les attaques pendant le blocage, une autre attaque ou lorsque le perso est en l'air
+        if (blocageEnCours || attaqueEnCours || !toucheSol)
+        {
+            lesInputs.attaque = false;
+            lesInputs.superAttaque = false;
+            return;
+        }
+
         // Attaque normale
         if (lesInputs.attaque)
         {
@@ -278,8 +285,12 @@ public class BougePerso : MonoBehaviour
     // Gestion du blocage avec le bouclier
     void Bloquer()
     {
-        // Vérifie si le perso est en train d'attaquer
+        // Vérifie si une attaque est en cours
         bool attaqueEnCours = animator.GetCurrentAnimatorStateInfo(0).IsTag("Attack");
+
+        // Vérifie aussi la prochaine animation si une transition est en cours
+        if (animator.IsInTransition(0))
+            attaqueEnCours |= animator.GetNextAnimatorStateInfo(0).IsTag("Attack");
 
         // Détermine si le perso peut bloquer
         bool peutBloquer = toucheSol && !attaqueEnCours;
@@ -311,6 +322,11 @@ public class BougePerso : MonoBehaviour
     // Quand le perso entre en collision avec qq
     void OnTriggerEnter(Collider collision)
     {
+        // Ignore les collisions si la partie est terminée
+        if (partieTerminee)
+            return;
+
+
         // Murs limites du terrain
         if (collision.CompareTag("mursLimites"))
         {
@@ -325,6 +341,13 @@ public class BougePerso : MonoBehaviour
         // Collision avec les ennemis
         if (collision.CompareTag("Ennemi"))
         {
+            // Ignore les dégâts pendant le blocage
+            if (animator.GetBool("IsBlocking"))
+            {
+                animator.SetTrigger("BlockDamage");
+                return;
+            }
+
             // Ignore les dégâts pendant l'invincibilité
             if (Time.time < prochainDegatPossible)
                 return;
@@ -337,6 +360,9 @@ public class BougePerso : MonoBehaviour
 
             // Active le son de douleur
             //audioOuch.enabled = true;
+
+            // Déclenche l'animation de dégâts
+            animator.SetTrigger("IsDamaged");
 
             // Affiche les PV mis à jour
             PointsVie();
@@ -352,28 +378,15 @@ public class BougePerso : MonoBehaviour
         // Empêche d'avoir moins de 0 PV ou plus de 4 PV
         infosPerso.nbPV = Mathf.Clamp(infosPerso.nbPV, 0, 4);
 
-        // Tableau contenant les 4 coeurs
-        //GameObject[] coeurs = { PV1, PV2, PV3, PV4 };
-
-        // Parcourt les 4 coeurs
-        //for (int i = 0; i < coeurs.Length; i++)
-        //{
-        // Détermine si le coeur doit être visible
-        //bool actif = i < infosPerso.nbPV;
-        //coeurs[i].SetActive(actif);
-
-        // Récupère l'Animator du coeur
-        //Animator animatorCoeur = coeurs[i].GetComponent<Animator>();
-
-        // Anime uniquement le coeur correspondant aux PV actuels
-        //animatorCoeur.enabled = (i == infosPerso.nbPV - 1);
-        //}
-
-        // Si le perso n'a plus de PV, charge la scène de défaite
+        // Si le perso n'a plus de PV
         if (infosPerso.nbPV == 0 && !defaiteEnAttente)
         {
+            // Empêche de terminer la partie plusieurs fois
             defaiteEnAttente = true;
-            //Invoke(nameof(SceneDefaite), 1f);
+            partieTerminee = true;
+
+            // Déclenche l'animation de mort
+            animator.SetBool("IsDead", true);
         }
     }
 
@@ -437,6 +450,14 @@ public class BougePerso : MonoBehaviour
         if (vitesseVerticale > vitesseFinale)
             vitesseVerticale = Mathf.Max(vitesseVerticale + gravite * Time.deltaTime, vitesseFinale);
 
+        // Vérifie si le perso est en train d'attaquer ou de bloquer
+        bool attaqueEnCours = animator.GetCurrentAnimatorStateInfo(0).IsTag("Attack");
+        bool blocageEnCours = animator.GetBool("IsBlocking");
+
+        // Vérifie aussi la prochaine animation si une transition est en cours
+        if (animator.IsInTransition(0))
+            attaqueEnCours |= animator.GetNextAnimatorStateInfo(0).IsTag("Attack");
+
         // Si le perso touche au sol
         if (toucheSol)
         {
@@ -444,8 +465,8 @@ public class BougePerso : MonoBehaviour
             if (vitesseVerticale < 0.0f)
                 vitesseVerticale = -2f;
 
-            // Si on appuie sur la barre d'espace et que le délai est terminé : saute
-            if (lesInputs.saute && sautTimeout <= 0.0f)
+            // Si on appuie sur la barre d'espace, que le délai est terminé et qu'aucune action ne bloque le saut
+            if (lesInputs.saute && sautTimeout <= 0.0f && !attaqueEnCours && !blocageEnCours)
             {
                 vitesseVerticale = Mathf.Sqrt(hauteurSaut * -2f * gravite);
                 animator.SetBool("IsJumping", true);
