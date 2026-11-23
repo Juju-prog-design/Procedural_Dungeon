@@ -44,17 +44,20 @@ public class StarterAssetsInputs : MonoBehaviour
     public void OnAttaque(InputValue value)
     {
         attaque = value.isPressed;
+        Debug.Log("Attaque : " + attaque);
     }
 
     // Super attaque (E)
     public void OnSuperAttaque(InputValue value)
     {
         superAttaque = value.isPressed;
+        Debug.Log("Super Attaque : " + superAttaque);
     }
 
     // Block avec le bouclier (Right Click)
     public void OnBloquer(InputValue value)
     {
         bloquer = value.isPressed;
+        Debug.Log("Bloquer : " + bloquer);
     }
 }

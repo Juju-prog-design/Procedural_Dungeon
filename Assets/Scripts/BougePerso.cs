@@ -116,7 +116,7 @@ public class BougePerso : MonoBehaviour
     void Start()
     {
         // Verrouille le curseur
-        Cursor.lockState = CursorLockMode.Confined;
+        //Cursor.lockState = CursorLockMode.Confined;
 
         // Met à jour l'affichage initial des PV
         infosPerso.nbPV = 4;
