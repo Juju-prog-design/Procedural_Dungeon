@@ -137,11 +137,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BougePerso
   vitesseMarche: 6
   vitesseCourse: 10
-  vitesseRotation: 1
   accelerationDeceleration: 10
   deceleration: 30
   hauteurSaut: 1.2
-  Gravite: -15
+  gravite: -15
   delaiSaut: 0.1
   toucheSol: 1
   distanceDuSol: -0.14
@@ -149,19 +148,8 @@ MonoBehaviour:
   layerSol:
     serializedVersion: 2
     m_Bits: 1
-  cibleCinemachine: {fileID: 0}
-  maxMouvCamHaut: 90
-  maxMouvCamBas: -90
-  zoneBordEcran: 20
-  vitesseRotationBord: 100
-  cinemachineFP: {fileID: 0}
-  cinemachineTP: {fileID: 0}
   cameraTP: {fileID: 0}
-  ajusteVelocityRotation: 0.1
-  ajusteTempsRotation: 0.1
   animator: {fileID: 0}
-  arme: {fileID: 0}
-  mire: {fileID: 0}
   dureeInvincibilite: 1.5
   infosPerso: {fileID: 0}
 --- !u!114 &6461897965989446756

@@ -54,7 +54,6 @@ public class BougePerso : MonoBehaviour
 
     [Space(5)]
     [Header("Animator")]
-    // Animator du perso
     [SerializeField] private Animator animator;
 
 
@@ -74,7 +73,7 @@ public class BougePerso : MonoBehaviour
 
 
     //[Space(5)]
-    //[Header("Pts de vie")]
+    [Header("Pts de vie")]
     [Tooltip("Durée d'invincibilité après avoir reçu des dégâts")]
     [SerializeField] private float dureeInvincibilite = 1.5f;
 
