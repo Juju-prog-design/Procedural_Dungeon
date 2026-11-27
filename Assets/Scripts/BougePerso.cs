@@ -284,18 +284,31 @@ public class BougePerso : MonoBehaviour
     // Gestion du blocage avec le bouclier
     void Bloquer()
     {
-        // Vérifie si une attaque est en cours
+        // Vérifie si une animation d'attaque est actuellement en cours
         bool attaqueEnCours = animator.GetCurrentAnimatorStateInfo(0).IsTag("Attack");
 
-        // Vérifie aussi la prochaine animation si une transition est en cours
+        // Vérifie également si une transition est en cours vers une animation d'attaque
         if (animator.IsInTransition(0))
             attaqueEnCours |= animator.GetNextAnimatorStateInfo(0).IsTag("Attack");
 
-        // Détermine si le perso peut bloquer
-        bool peutBloquer = toucheSol && !attaqueEnCours;
+        // Le blocage peut être demandé uniquement si le perso touche le sol et qu'aucune attaque n'est en cours
+        bool peutDemanderBlocage = toucheSol && !attaqueEnCours;
 
-        // Active ou désactive le blocage
-        animator.SetBool("IsBlocking", lesInputs.bloquer && peutBloquer);
+        // Vérifie si le joueur maintient le clic droit et s'il peut bloquer
+        bool demandeBlocage = lesInputs.bloquer && peutDemanderBlocage;
+
+        // Indique à l'Animator que le joueur demande un blocage
+        animator.SetBool("IsBlockRequested", demandeBlocage);
+
+        // Récupère l'identifiant de l'état actuellement joué dans l'Animator
+        int etatActuel = animator.GetCurrentAnimatorStateInfo(0).shortNameHash;
+
+        // Vérifie si le perso se trouve dans un état où le bouclier est considéré comme actif
+        bool blocageActif = etatActuel == Animator.StringToHash("Block Idle") || etatActuel == Animator.StringToHash("Block Walk") ||
+            etatActuel == Animator.StringToHash("Block Run") || etatActuel == Animator.StringToHash("Block Damage");
+
+        // Le blocage est actif uniquement si le joueur le demande et si le perso se trouve dans l'un des états autorisés
+        animator.SetBool("IsBlocking", demandeBlocage && blocageActif);
     }
 
 
